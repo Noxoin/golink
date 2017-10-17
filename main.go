@@ -6,26 +6,23 @@ import (
 	"log"
 	"net/http"
 
-	"google.golang.org/appengine"
-	"github.com/noxoin/golink"
+	"github.com/noxoin/golink/handlers"
 )
 
 var FLAG_port string
-var FLAG_host string
 
 func initFlags() {
-	flag.StringVar(&FLAG_port, "port", "80", "Serving Port")
-	flag.StringVar(&FLAG_host, "host", "localhost", "Serving Hostname")
+	flag.StringVar(&FLAG_port, "port", "8080", "Serving Port")
 	flag.Parse()
 }
 
 func main() {
 	initFlags()
+	handlers.InitHandlers()
 
-	http.HandleFunc("/", golink.Handler)
 	http.HandleFunc("/_ah/health", healthCheckHandler)
 	log.Printf("Server listening on port %s", FLAG_port)
-	appengine.Main()
+	log.Fatal(http.ListenAndServe(":" + FLAG_port, nil))
 }
 
 func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
