@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/noxoin/golink/handlers"
+	"google.golang.org/appengine"
 )
 
 var FLAG_port string
@@ -19,10 +20,9 @@ func initFlags() {
 func main() {
 	initFlags()
 	handlers.InitHandlers()
-
 	http.HandleFunc("/_ah/health", healthCheckHandler)
 	log.Printf("Server listening on port %s", FLAG_port)
-	log.Fatal(http.ListenAndServe(":" + FLAG_port, nil))
+	appengine.Main()
 }
 
 func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
