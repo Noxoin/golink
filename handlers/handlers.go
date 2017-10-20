@@ -6,7 +6,8 @@ import (
 )
 
 func InitHandlers() {
-	http.HandleFunc("/", redirectHandler)
+	http.HandleFunc("/", listHandler)
+	http.HandleFunc("/*", redirectHandler)
 }
 
 func redirectHandler(w http.ResponseWriter, r *http.Request) {
@@ -15,7 +16,7 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	dataObject, err:= NewDataObject("api-project-377888563324")
+	dataObject, err := NewDataObject("api-project-377888563324", r)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -27,5 +28,21 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println("name:", name, "url:", url)
 	http.Redirect(w, r, url, 302)
+}
+
+func listHandler(w http.ResponseWriter, r *http.Request) {
+	dataObject, err := NewDataObject("api-project-377888563324", r)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	data, err := dataObject.GetListOfLinks()
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	for _, entry := range data {
+		fmt.Fprintf(w, "name: %v\nlink: %v\n\n", entry.Name, entry.Url)
+	}
 }
 
