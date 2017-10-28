@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/noxoin/golink/handlers"
+	"github.com/noxoin/golink/server"
 	"google.golang.org/appengine"
 )
 
@@ -19,7 +19,7 @@ func initFlags() {
 
 func main() {
 	initFlags()
-	handlers.InitHandlers()
+	server.InitHandlers()
 	http.HandleFunc("/_ah/health", healthCheckHandler)
 	log.Printf("Server listening on port %s", FLAG_port)
 	appengine.Main()
