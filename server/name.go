@@ -5,9 +5,12 @@ import (
 	"regexp"
 )
 
-var nameRegex = "^[A-Za-z0-9-_]*$"
+var nameRegex = "^[A-Za-z][A-Za-z0-9-_]*$"
 
 func validateLinkName(name string) (bool, error) {
+	if name == "" {
+		return true, nil
+	}
 	return regexp.MatchString(nameRegex, name)
 }
 
