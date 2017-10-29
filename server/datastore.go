@@ -17,11 +17,11 @@ func getURL(ctx context.Context, name string) (string, error) {
 		return "", err
 	}
 	key := datastore.NameKey("golink", name, nil)
-	var golink goStore
-	if err := client.Get(ctx, key, &golink); err != nil {
+	var val goStore
+	if err := client.Get(ctx, key, &val); err != nil {
 		return "", err
 	}
-	return golink.Url, nil
+	return val.Url, nil
 }
 
 type Golink struct {
@@ -52,5 +52,21 @@ func getListOfLinks(ctx context.Context) ([]*Golink, error) {
 		})
 	}
 	return res, nil
+}
+
+func updateLink(ctx context.Context, golink Golink) (error) {
+	client, err := datastore.NewClient(ctx, ctx.Value("projectId").(string))
+	if err != nil {
+		return err
+	}
+	key := datastore.NameKey("golink", golink.Name, nil)
+	val := goStore{
+		Key: key,
+		Url: golink.Url,
+	}
+	if _, err := client.Put(ctx, key, &val); err != nil {
+		return err
+	}
+	return nil
 }
 
