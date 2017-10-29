@@ -1,6 +1,8 @@
 package server
 
 import (
+	"time"
+
 	"cloud.google.com/go/datastore"
 	"golang.org/x/net/context"
 	"google.golang.org/api/iterator"
@@ -9,6 +11,7 @@ import (
 type goStore struct {
 	Key *datastore.Key `datastore:"__key__"`
 	Url string `datastore:"url"`
+	Timestamp int64 `datastore:"timestamp"`
 }
 
 func getURL(ctx context.Context, name string) (string, error) {
@@ -34,7 +37,7 @@ func getListOfLinks(ctx context.Context) ([]*Golink, error) {
 	if err != nil {
 		return nil, err
 	}
-	query := datastore.NewQuery("golink")
+	query := datastore.NewQuery("golink").Order("-timestamp")
 	it := client.Run(ctx, query)
 	res := []*Golink{}
 	for {
@@ -63,6 +66,7 @@ func updateLink(ctx context.Context, golink Golink) (error) {
 	val := goStore{
 		Key: key,
 		Url: golink.Url,
+		Timestamp: time.Now().UnixNano(),
 	}
 	if _, err := client.Put(ctx, key, &val); err != nil {
 		return err
