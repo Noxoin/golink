@@ -19,7 +19,9 @@ func initFlags() {
 
 func main() {
 	initFlags()
-	server.InitHandlers()
+	if err := server.Init(); err != nil {
+		panic(err)
+	}
 	http.HandleFunc("/_ah/health", healthCheckHandler)
 	log.Printf("Server listening on port %s", FLAG_port)
 	appengine.Main()

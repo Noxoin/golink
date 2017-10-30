@@ -12,20 +12,18 @@ import (
 var (
 	projectId = "api-project-377888563324"
 	indexHtml = "templates/index.html"
+	ds *DataStore
 )
 
-func InitHandlers() {
+func Init() (error) {
 	http.HandleFunc("/", redirectHandler)
-}
-
-func getContext(r *http.Request) (context.Context) {
-	ctx := appengine.NewContext(r)
-	ctx = context.WithValue(ctx, "projectId", projectId)
-	return ctx
+	var err error
+	ds, err = NewDataStore(context.Background(), projectId)
+	return err
 }
 
 func redirectHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := getContext(r)
+	ctx := appengine.NewContext(r)
 	name, err := getLinkName(r.URL.Path)
 	if err != nil {
 		http.NotFound(w, r)
@@ -35,7 +33,7 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 		listHandler(w, r)
 		return
 	}
-	url, err := getURL(ctx, name)
+	url, err := ds.GetURL(ctx, name)
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -45,8 +43,8 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func listHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := getContext(r)
-	data, err := getListOfLinks(ctx)
+	ctx := appengine.NewContext(r)
+	data, err := ds.GetListOfLinks(ctx)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
