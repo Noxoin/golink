@@ -6,22 +6,18 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/noxoin/golink/server"
+	_ "github.com/noxoin/golink/server"
 	"google.golang.org/appengine"
 )
 
 var FLAG_port string
 
-func initFlags() {
+func init() {
 	flag.StringVar(&FLAG_port, "port", "8080", "Serving Port")
 	flag.Parse()
 }
 
 func main() {
-	initFlags()
-	if err := server.Init(); err != nil {
-		panic(err)
-	}
 	http.HandleFunc("/_ah/health", healthCheckHandler)
 	log.Printf("Server listening on port %s", FLAG_port)
 	appengine.Main()

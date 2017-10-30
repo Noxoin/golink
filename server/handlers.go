@@ -14,10 +14,10 @@ var (
 	ds *DataStore
 )
 
-func Init() (error) {
+func init() {
 	http.HandleFunc("/", redirectHandler)
+	http.HandleFunc("/api/v1/", apiHandler)
 	ds = NewDataStore(projectId)
-	return nil
 }
 
 func redirectHandler(w http.ResponseWriter, r *http.Request) {
@@ -52,5 +52,47 @@ func listHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 	}
 	tmpl.Execute(w, data)
+}
+
+func apiHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		updateHandler(w, r)
+		return
+	}
+	http.NotFound(w, r)
+	return
+}
+
+func updateHandler(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	names := r.Form["name"]
+	urls := r.Form["url"]
+	if len(names) != 1 || len(urls) != 1 {
+		http.Error(w, "Invalid Request", 400)
+		return
+	}
+	name, err := getLinkName(names[0])
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	if name == "" {
+		http.Error(w, "Invalid Request", 400)
+		return
+	}
+	url := urls[0]
+	ctx := appengine.NewContext(r)
+	golink := Golink{
+		Name: name,
+		Url: url,
+	}
+	if err := ds.UpdateLink(ctx, golink); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	fmt.Fprintf(w, "Ok")
 }
 
