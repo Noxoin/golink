@@ -5,7 +5,6 @@ import (
 	"html/template"
 	"net/http"
 
-	"golang.org/x/net/context"
 	"google.golang.org/appengine"
 )
 
@@ -17,9 +16,8 @@ var (
 
 func Init() (error) {
 	http.HandleFunc("/", redirectHandler)
-	var err error
-	ds, err = NewDataStore(context.Background(), projectId)
-	return err
+	ds = NewDataStore(projectId)
+	return nil
 }
 
 func redirectHandler(w http.ResponseWriter, r *http.Request) {

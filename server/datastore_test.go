@@ -7,9 +7,13 @@ import (
 	"golang.org/x/net/context"
 )
 
+var (
+	testProjectId = "default"
+)
+
 func TestGetLink(t *testing.T) {
 	ctx := context.Background()
-	client, err := datastore.NewClient(ctx, "default")
+	client, err := datastore.NewClient(ctx, testProjectId)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -24,10 +28,7 @@ func TestGetLink(t *testing.T) {
 	if _, err := client.Put(ctx, key, entity); err != nil {
 		t.Fatalf("Failed Setup: %v", err)
 	}
-	ds, err := NewDataStore(ctx, "default")
-	if err != nil {
-		t.Fatal(err)
-	}
+	ds := NewDataStore(testProjectId)
 	url, err := ds.GetURL(ctx, "foo")
 	if err != nil {
 		t.Fatal(err)
@@ -39,7 +40,7 @@ func TestGetLink(t *testing.T) {
 
 func TestUpdateLink(t *testing.T) {
 	ctx := context.Background()
-	client, err := datastore.NewClient(ctx, "default")
+	client, err := datastore.NewClient(ctx, testProjectId)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -47,10 +48,7 @@ func TestUpdateLink(t *testing.T) {
 	key := datastore.NameKey("golink", "testing", nil)
 	defer client.Delete(ctx, key)
 
-	ds, err := NewDataStore(ctx, "default")
-	if err != nil {
-		t.Fatal(err)
-	}
+	ds := NewDataStore(testProjectId)
 	golink := Golink {
 		Name: "testing",
 		Url: "https://www.noxoin.com/",
@@ -69,16 +67,13 @@ func TestUpdateLink(t *testing.T) {
 
 func TestGetListOfLinks(t *testing.T) {
 	ctx := context.Background()
-	client, err := datastore.NewClient(ctx, "default")
+	client, err := datastore.NewClient(ctx, testProjectId)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer client.Close()
 
-	ds, err := NewDataStore(ctx, "default")
-	if err != nil {
-		t.Fatal(err)
-	}
+	ds := NewDataStore(testProjectId)
 	golink := Golink {
 		Name: "testing",
 		Url: "https://www.noxoin.com/",
