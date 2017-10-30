@@ -15,6 +15,7 @@ type goStore struct {
 }
 
 type DataStore struct {
+	client *datastore.Client
 	projectId string
 }
 
@@ -23,32 +24,29 @@ type Golink struct {
 	Url string
 }
 
-func NewDataStore(projectId string) (*DataStore) {
-	return &DataStore{
-		projectId: projectId,
+func NewDataStore(ctx context.Context, projectId string) (*DataStore, error) {
+	client, err := datastore.NewClient(ctx, projectId)
+	if err != nil {
+		return nil, err
 	}
+	return &DataStore{
+		client: client,
+		projectId: projectId,
+	}, nil
 }
 
 func (d *DataStore) GetURL(ctx context.Context, name string) (string, error) {
-	client, err := datastore.NewClient(ctx, projectId)
-	if err != nil {
-		return "", err
-	}
 	key := datastore.NameKey("golink", name, nil)
 	var val goStore
-	if err := client.Get(ctx, key, &val); err != nil {
+	if err := d.client.Get(ctx, key, &val); err != nil {
 		return "", err
 	}
 	return val.Url, nil
 }
 
 func (d *DataStore) GetListOfLinks(ctx context.Context) ([]*Golink, error) {
-	client, err := datastore.NewClient(ctx, projectId)
-	if err != nil {
-		return nil, err
-	}
 	query := datastore.NewQuery("golink").Order("-timestamp")
-	it := client.Run(ctx, query)
+	it := d.client.Run(ctx, query)
 	res := []*Golink{}
 	for {
 		var g goStore
@@ -68,17 +66,13 @@ func (d *DataStore) GetListOfLinks(ctx context.Context) ([]*Golink, error) {
 }
 
 func (d *DataStore) UpdateLink(ctx context.Context, golink Golink) (error) {
-	client, err := datastore.NewClient(ctx, projectId)
-	if err != nil {
-		return err
-	}
 	key := datastore.NameKey("golink", golink.Name, nil)
 	val := goStore{
 		Key: key,
 		Url: golink.Url,
 		Timestamp: time.Now().UnixNano(),
 	}
-	if _, err := client.Put(ctx, key, &val); err != nil {
+	if _, err := d.client.Put(ctx, key, &val); err != nil {
 		return err
 	}
 	return nil

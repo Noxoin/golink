@@ -11,24 +11,31 @@ import (
 var (
 	projectId = "api-project-377888563324"
 	indexHtml = "templates/index.html"
-	ds *DataStore
 )
 
 func init() {
-	http.HandleFunc("/", redirectHandler)
+	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/api/v1/", apiHandler)
-	ds = NewDataStore(projectId)
+}
+
+func rootHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/" {
+		listHandler(w, r)
+		return
+	}
+	redirectHandler(w, r)
 }
 
 func redirectHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
+	ds, err := NewDataStore(ctx, projectId)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
 	name, err := getLinkName(r.URL.Path)
 	if err != nil {
 		http.NotFound(w, r)
-		return
-	}
-	if name == "" {
-		listHandler(w, r)
 		return
 	}
 	url, err := ds.GetURL(ctx, name)
@@ -42,6 +49,11 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 
 func listHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
+	ds, err := NewDataStore(ctx, projectId)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
 	data, err := ds.GetListOfLinks(ctx)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -85,6 +97,11 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	url := urls[0]
 	ctx := appengine.NewContext(r)
+	ds, err := NewDataStore(ctx, projectId)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
 	golink := Golink{
 		Name: name,
 		Url: url,

@@ -9,7 +9,7 @@ func TestValidateLinkName(t *testing.T) {
 		input string
 		res bool
 	}{
-		{input: "", res: true},
+		{input: "", res: false},
 		{input: "foo", res: true},
 		{input: "foo2", res: true},
 		{input: "/foo", res: false},
@@ -37,7 +37,7 @@ func TestGetLinkName(t *testing.T) {
 	}{
 		{input: "", err: true},
 		{input: "/foo", res: "foo", err: false},
-		{input: "/", res: "", err: false},
+		{input: "/", err: true},
 		{input: "/2invalid", err: true},
 		{input: "valid", res: "valid", err: false},
 	}
