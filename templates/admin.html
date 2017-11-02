@@ -20,12 +20,8 @@
 						<tbody>
 							{{range .Golinks}}
 								<tr id="{{.Name}}">
-									<td>
-										{{.Name}}
-									</td>
-									<td>
-										{{.Url}}
-									</td>
+									<td>{{.Name}}</td>
+									<td><a href="{{.Url}}">{{.Url}}</a></td>
 									<td style="width:20px;border-left-width:0px">
 										<i class="trash icon"></i>
 									</td>
