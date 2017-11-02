@@ -20,7 +20,7 @@ func getLinkName(path string) (string, error) {
 	}
 	matched, err := validateLinkName(path)
 	if !matched || err != nil {
-		return "", errors.New("Invalid Link")
+		return "", errors.New("Invalid Link Name")
 	}
 	return path, nil
 }

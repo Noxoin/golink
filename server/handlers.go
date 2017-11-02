@@ -114,16 +114,12 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	names := r.Form["name"]
 	urls := r.Form["url"]
 	if len(names) != 1 || len(urls) != 1 {
-		http.Error(w, "Invalid Request", 400)
+		http.Error(w, "Expecting only one name and url.", 400)
 		return
 	}
-	name, err := getLinkName(names[0])
+	name, err := getLinkName("/" + names[0])
 	if err != nil {
 		http.Error(w, err.Error(), 400)
-		return
-	}
-	if name == "" {
-		http.Error(w, "Invalid Request", 400)
 		return
 	}
 	url := urls[0]
@@ -131,6 +127,11 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	ds, err := NewDataStore(ctx, projectId)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
+		return
+	}
+	_, err = ds.GetURL(ctx, name)
+  if err == nil {
+		http.Error(w, "Link Name Already Exists.", 400)
 		return
 	}
 	golink := Golink{

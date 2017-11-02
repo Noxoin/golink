@@ -4,7 +4,6 @@
 					<p>Welcome to Noxoin's Golink Redirector!</p>
 					<p>This contains all the links that are currently within the system. The resulting golink is https://go.noxoin.com/<i>name</i> and will redirect to the url.</p>
 					<div class="ui negative message hidden" id="addErrorMsg">
-						Error when adding link. Please check the information and try again.
 					</div>
 					<div class="ui action input fluid" id="addInfo">
 						<input name="name" type="text" value="" placeholder="Name" />
@@ -58,6 +57,7 @@ function addLink() {
 						classes.splice(classes.indexOf("hidden"), 1);
 						div.className = classes.join(" ");
 					}
+					div.innerHTML = xhttp.response;
 				}
 			}
 	};
