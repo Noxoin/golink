@@ -2,7 +2,11 @@ service: go
 runtime: go
 api_version: go1
 handlers:
-- url: /api/v1/*
+- url: /api/v1/.*
+  script: _go_app
+  login: admin
+
+- url: /admin/.*
   script: _go_app
   login: admin
 

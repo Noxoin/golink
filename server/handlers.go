@@ -10,12 +10,18 @@ import (
 
 var (
 	projectId = "api-project-377888563324"
-	indexHtml = "templates/index.html"
+	tmpls map[string]*template.Template
 )
 
 func init() {
 	http.HandleFunc("/", rootHandler)
+	http.HandleFunc("/admin/", adminHandler)
 	http.HandleFunc("/api/v1/", apiHandler)
+	tmpls = make(map[string]*template.Template)
+	tmpls["index"] = template.Must(template.ParseFiles(
+		"templates/base.html", "templates/index.html"))
+	tmpls["admin"] = template.Must(template.ParseFiles(
+		"templates/base.html", "templates/admin.html"))
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
@@ -54,16 +60,41 @@ func listHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	data, err := ds.GetListOfLinks(ctx)
+	res, err := ds.GetListOfLinks(ctx)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	tmpl, err := template.ParseFiles(indexHtml)
+	data := &struct{
+		Title string
+		Golinks []*Golink
+	}{
+		Title: "index",
+		Golinks: res,
+	}
+	tmpls["index"].ExecuteTemplate(w, "base", data)
+}
+
+func adminHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := appengine.NewContext(r)
+	ds, err := NewDataStore(ctx, projectId)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
+		return
 	}
-	tmpl.Execute(w, data)
+	res, err := ds.GetListOfLinks(ctx)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	data := &struct{
+		Title string
+		Golinks []*Golink
+	}{
+		Title: "admin",
+		Golinks: res,
+	}
+	tmpls["admin"].ExecuteTemplate(w, "base", data)
 }
 
 func apiHandler(w http.ResponseWriter, r *http.Request) {

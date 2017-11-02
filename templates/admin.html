@@ -1,0 +1,81 @@
+{{ define "body" }}
+			<div class="ui segment vertical stripe">
+				<div class="ui container">
+					<p>Welcome to Noxoin's Golink Redirector!</p>
+					<p>This contains all the links that are currently within the system. The resulting golink is https://go.noxoin.com/<i>name</i> and will redirect to the url.</p>
+					<table class="ui celled table">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th colspan="2">Url</th>
+							</tr>
+						</thead>
+						<tbody>
+							{{range .Golinks}}
+								<tr id="{{.Name}}">
+									<td style="width:25%">
+										{{.Name}}
+									</td>
+									<td>
+										{{.Url}}
+									</td>
+									<td style="width:70px">
+										<i class="edit icon" onclick="javascript:toggleEdit('{{.Name}}')"></i>
+										<i class="trash icon"></i>
+									</td>
+								</tr>
+							{{end}}
+						</tbody>
+					</table>
+				</div>
+			</div>
+<script type="text/javascript">
+function toEdit(row) {
+	var cells = row.children;
+	var name = cells[0].innerHTML.trim();
+	var url = cells[1].innerHTML.trim();
+	cells[0].innerHTML = `
+		<div class="ui fluid input">
+			<input name="name" type="text" value="${name}"/>
+		</div>`;
+	cells[1].innerHTML = `
+		<div class="ui fluid input">
+			<input name="name" type="text" value="${url}"/>
+		</div>`;
+	cells[2].innerHTML = `
+		<i class="green checkmark icon"></i>
+		<i class="red remove icon"></i>`;
+	row.className += " edit";
+}
+
+function toView(row) {
+	var cells = row.children;
+	var values = row.getElementsByTagName("input");
+	console.log(values);
+	var name = values[0].value;
+	var url = values[1].value;
+	cells[0].innerHTML = name;
+	cells[1].innerHTML = url;
+	cells[2].innerHTML = `
+		<i class="edit icon"></i>
+		<i class="trash icon"></i>`;
+	var classes = row.className.split(" ");
+	classes.splice("edit");
+	row.className = classes.join(" ");
+}
+
+function isEdit(row) {
+	var classes = row.className.split(" ");
+	return classes.indexOf("edit") > -1;
+}
+
+function toggleEdit(id) {
+	var row = document.getElementById(id);
+	if (isEdit(row)){
+		toView(row);
+	} else {
+		toEdit(row);
+	}
+}
+</script>
+{{ end }}
