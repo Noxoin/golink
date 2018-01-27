@@ -24,4 +24,3 @@ func getLinkName(path string) (string, error) {
 	}
 	return path, nil
 }
-

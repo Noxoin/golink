@@ -9,6 +9,7 @@ import (
 
 var (
 	testProjectId = "default"
+	kind          = "golink-test"
 )
 
 func TestGetLink(t *testing.T) {
@@ -18,9 +19,9 @@ func TestGetLink(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer client.Close()
-	key := datastore.NameKey("golink", "foo", nil)
+	key := datastore.NameKey(kind, "foo", nil)
 	defer client.Delete(ctx, key)
-	entity := &struct{
+	entity := &struct {
 		Url string `datastore:"url"`
 	}{
 		Url: "https://www.google.com/",
@@ -28,7 +29,7 @@ func TestGetLink(t *testing.T) {
 	if _, err := client.Put(ctx, key, entity); err != nil {
 		t.Fatalf("Failed Setup: %v", err)
 	}
-	ds, err := NewDataStore(ctx, testProjectId)
+	ds, err := NewDataStore(ctx, testProjectId, kind)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -48,16 +49,16 @@ func TestUpdateLink(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer client.Close()
-	key := datastore.NameKey("golink", "testing", nil)
+	key := datastore.NameKey(kind, "testing", nil)
 	defer client.Delete(ctx, key)
 
-	ds, err := NewDataStore(ctx, testProjectId)
+	ds, err := NewDataStore(ctx, testProjectId, kind)
 	if err != nil {
 		t.Fatal(err)
 	}
-	golink := Golink {
+	golink := Golink{
 		Name: "testing",
-		Url: "https://www.noxoin.com/",
+		Url:  "https://www.noxoin.com/",
 	}
 	if err := ds.UpdateLink(ctx, golink); err != nil {
 		t.Fatal(err)
@@ -79,27 +80,27 @@ func TestGetListOfLinks(t *testing.T) {
 	}
 	defer client.Close()
 
-	ds, err := NewDataStore(ctx, testProjectId)
+	ds, err := NewDataStore(ctx, testProjectId, kind)
 	if err != nil {
 		t.Fatal(err)
 	}
-	golink := Golink {
+	golink := Golink{
 		Name: "testing",
-		Url: "https://www.noxoin.com/",
+		Url:  "https://www.noxoin.com/",
 	}
 	if err := ds.UpdateLink(ctx, golink); err != nil {
 		t.Fatal(err)
 	}
-	defer client.Delete(ctx, datastore.NameKey("golink", "testing", nil))
+	defer client.Delete(ctx, datastore.NameKey(kind, "testing", nil))
 
-	golink = Golink {
+	golink = Golink{
 		Name: "foo",
-		Url: "https://www.google.com/",
+		Url:  "https://www.google.com/",
 	}
 	if err := ds.UpdateLink(ctx, golink); err != nil {
 		t.Fatal(err)
 	}
-	defer client.Delete(ctx, datastore.NameKey("golink", "foo", nil))
+	defer client.Delete(ctx, datastore.NameKey(kind, "foo", nil))
 
 	golinks, err := ds.GetListOfLinks(ctx)
 	if err != nil {
@@ -115,4 +116,3 @@ func TestGetListOfLinks(t *testing.T) {
 		t.Errorf("TestGetListOfLinks second result failed: got: %v, want: https://www.noxoin.com/", golinks[1].Url)
 	}
 }
-

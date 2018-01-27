@@ -7,7 +7,7 @@ import (
 func TestValidateLinkName(t *testing.T) {
 	tests := []struct {
 		input string
-		res bool
+		res   bool
 	}{
 		{input: "", res: false},
 		{input: "foo", res: true},
@@ -18,7 +18,7 @@ func TestValidateLinkName(t *testing.T) {
 		{input: "-wer", res: false},
 		{input: "3wer", res: false},
 	}
-	for _, test := range(tests) {
+	for _, test := range tests {
 		r, err := validateLinkName(test.input)
 		if err != nil {
 			t.Errorf("TestValidateLinkName failed on %v: %v", test.input, err.Error())
@@ -32,8 +32,8 @@ func TestValidateLinkName(t *testing.T) {
 func TestGetLinkName(t *testing.T) {
 	tests := []struct {
 		input string
-		res string
-		err bool
+		res   string
+		err   bool
 	}{
 		{input: "", err: true},
 		{input: "/foo", res: "foo", err: false},
@@ -41,7 +41,7 @@ func TestGetLinkName(t *testing.T) {
 		{input: "/2invalid", err: true},
 		{input: "valid", res: "valid", err: false},
 	}
-	for _, test := range(tests) {
+	for _, test := range tests {
 		r, err := getLinkName(test.input)
 		if (err != nil) != test.err {
 			t.Errorf("TestGetLinkName failed on error %v: got: %v, wanted: %v", test.input, test.err, err != nil)

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"flag"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -10,7 +11,8 @@ import (
 
 var (
 	projectId = "api-project-377888563324"
-	tmpls map[string]*template.Template
+	kind      = flag.String("datastore_kind", "", "datastore kind used")
+	tmpls     map[string]*template.Template
 )
 
 func init() {
@@ -34,7 +36,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 
 func redirectHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
-	ds, err := NewDataStore(ctx, projectId)
+	ds, err := NewDataStore(ctx, projectId, *kind)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -55,7 +57,7 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 
 func listHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
-	ds, err := NewDataStore(ctx, projectId)
+	ds, err := NewDataStore(ctx, projectId, *kind)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -65,11 +67,11 @@ func listHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	data := &struct{
-		Title string
+	data := &struct {
+		Title   string
 		Golinks []*Golink
 	}{
-		Title: "index",
+		Title:   "index",
 		Golinks: res,
 	}
 	tmpls["index"].ExecuteTemplate(w, "base", data)
@@ -77,7 +79,7 @@ func listHandler(w http.ResponseWriter, r *http.Request) {
 
 func adminHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
-	ds, err := NewDataStore(ctx, projectId)
+	ds, err := NewDataStore(ctx, projectId, *kind)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -87,11 +89,11 @@ func adminHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-	data := &struct{
-		Title string
+	data := &struct {
+		Title   string
 		Golinks []*Golink
 	}{
-		Title: "admin",
+		Title:   "admin",
 		Golinks: res,
 	}
 	tmpls["admin"].ExecuteTemplate(w, "base", data)
@@ -124,19 +126,19 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	url := urls[0]
 	ctx := appengine.NewContext(r)
-	ds, err := NewDataStore(ctx, projectId)
+	ds, err := NewDataStore(ctx, projectId, *kind)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 	_, err = ds.GetURL(ctx, name)
-  if err == nil {
+	if err == nil {
 		http.Error(w, "Link Name Already Exists.", 400)
 		return
 	}
 	golink := Golink{
 		Name: name,
-		Url: url,
+		Url:  url,
 	}
 	if err := ds.UpdateLink(ctx, golink); err != nil {
 		http.Error(w, err.Error(), 500)
@@ -144,4 +146,3 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Fprintf(w, "Ok")
 }
-
