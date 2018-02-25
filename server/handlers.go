@@ -1,19 +1,25 @@
 package server
 
 import (
-	"flag"
 	"fmt"
 	"html/template"
 	"net/http"
+	"os"
 
 	"google.golang.org/appengine"
 )
 
 var (
 	projectId = "api-project-377888563324"
-	kind      = flag.String("datastore_kind", "", "datastore kind used")
+	kind      string
 	tmpls     map[string]*template.Template
 )
+
+func loadEnvVars() {
+	if v := os.Getenv("DS_KIND"); v != "" {
+		kind = v
+	}
+}
 
 func init() {
 	http.HandleFunc("/", rootHandler)
@@ -24,6 +30,8 @@ func init() {
 		"templates/base.html", "templates/index.html"))
 	tmpls["admin"] = template.Must(template.ParseFiles(
 		"templates/base.html", "templates/admin.html"))
+
+	loadEnvVars()
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +44,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 
 func redirectHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
-	ds, err := NewDataStore(ctx, projectId, *kind)
+	ds, err := NewDataStore(ctx, projectId, kind)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -57,7 +65,7 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 
 func listHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
-	ds, err := NewDataStore(ctx, projectId, *kind)
+	ds, err := NewDataStore(ctx, projectId, kind)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -79,7 +87,7 @@ func listHandler(w http.ResponseWriter, r *http.Request) {
 
 func adminHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := appengine.NewContext(r)
-	ds, err := NewDataStore(ctx, projectId, *kind)
+	ds, err := NewDataStore(ctx, projectId, kind)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -126,7 +134,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	url := urls[0]
 	ctx := appengine.NewContext(r)
-	ds, err := NewDataStore(ctx, projectId, *kind)
+	ds, err := NewDataStore(ctx, projectId, kind)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return

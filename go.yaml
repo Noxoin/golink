@@ -1,6 +1,7 @@
 service: go
 runtime: go
 api_version: go1
+
 handlers:
 - url: /api/v1/.*
   script: _go_app
@@ -13,3 +14,5 @@ handlers:
 - url: /.*
   script: _go_app
 
+env_variables:
+  DS_KIND: "golink"
