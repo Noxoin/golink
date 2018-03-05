@@ -11,6 +11,7 @@ import (
 type goStore struct {
 	Key       *datastore.Key `datastore:"__key__"`
 	Url       string         `datastore:"url"`
+	Count     int64          `datastore:"count"`
 	Timestamp int64          `datastore:"timestamp"`
 }
 
@@ -21,8 +22,9 @@ type DataStore struct {
 }
 
 type Golink struct {
-	Name string
-	Url  string
+	Name  string
+	Url   string
+	Count int64
 }
 
 func NewDataStore(ctx context.Context, projectId, kind string) (*DataStore, error) {
@@ -60,8 +62,9 @@ func (d *DataStore) GetListOfLinks(ctx context.Context) ([]*Golink, error) {
 			return nil, err
 		}
 		res = append(res, &Golink{
-			Name: g.Key.Name,
-			Url:  g.Url,
+			Name:  g.Key.Name,
+			Url:   g.Url,
+			Count: g.Count,
 		})
 	}
 	return res, nil
@@ -72,8 +75,22 @@ func (d *DataStore) UpdateLink(ctx context.Context, golink Golink) error {
 	val := goStore{
 		Key:       key,
 		Url:       golink.Url,
+		Count:     0,
 		Timestamp: time.Now().UnixNano(),
 	}
+	if _, err := d.client.Put(ctx, key, &val); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (d *DataStore) IncrementCount(ctx context.Context, name string) error {
+	key := datastore.NameKey(d.kind, name, nil)
+	var val goStore
+	if err := d.client.Get(ctx, key, &val); err != nil {
+		return err
+	}
+	val.Count++
 	if _, err := d.client.Put(ctx, key, &val); err != nil {
 		return err
 	}

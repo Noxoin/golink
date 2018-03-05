@@ -60,6 +60,7 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println("name:", name, "url:", url)
+	ds.IncrementCount(ctx, name)
 	http.Redirect(w, r, url, 302)
 }
 
