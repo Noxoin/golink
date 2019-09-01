@@ -3,15 +3,13 @@ runtime: go112
 
 handlers:
 - url: /api/v1/.*
-  script: _go_app
-  login: admin
+  script: auto
 
 - url: /admin/.*
-  script: _go_app
-  login: admin
+  script: auto
 
 - url: /.*
-  script: _go_app
+  script: auto
 
 env_variables:
   DS_KIND: "golink"
