@@ -5,8 +5,6 @@ import (
 	"html/template"
 	"net/http"
 	"os"
-
-	"google.golang.org/appengine"
 )
 
 var (
@@ -43,7 +41,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func redirectHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
+	ctx := r.Context()
 	ds, err := NewDataStore(ctx, projectId, kind)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -65,7 +63,7 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func listHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
+	ctx := r.Context()
 	ds, err := NewDataStore(ctx, projectId, kind)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -87,7 +85,7 @@ func listHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func adminHandler(w http.ResponseWriter, r *http.Request) {
-	ctx := appengine.NewContext(r)
+	ctx := r.Context()
 	ds, err := NewDataStore(ctx, projectId, kind)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
@@ -134,7 +132,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	url := urls[0]
-	ctx := appengine.NewContext(r)
+	ctx := r.Context()
 	ds, err := NewDataStore(ctx, projectId, kind)
 	if err != nil {
 		http.Error(w, err.Error(), 500)

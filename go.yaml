@@ -1,6 +1,5 @@
 service: go
-runtime: go
-api_version: go1
+runtime: go112
 
 handlers:
 - url: /api/v1/.*
