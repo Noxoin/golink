@@ -4,12 +4,18 @@ runtime: go112
 handlers:
 - url: /api/v1/.*
   script: auto
+  secure: always
+  redirect_http_response_code: 301
 
 - url: /admin/.*
   script: auto
+  secure: always
+  redirect_http_response_code: 301
 
 - url: /.*
   script: auto
+  secure: always
+  redirect_http_response_code: 301
 
 env_variables:
   DS_KIND: "golink"
