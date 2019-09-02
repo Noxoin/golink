@@ -1,0 +1,5 @@
+dispatch:
+  - url: "go.noxoin.com/*"
+    service: "go"
+  - url: "noxo.in/*"
+    service: "go"
