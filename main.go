@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	_ "github.com/noxoin/golink/server"
+	_ "github.com/Noxoin/golink/server"
 )
 
 func main() {
